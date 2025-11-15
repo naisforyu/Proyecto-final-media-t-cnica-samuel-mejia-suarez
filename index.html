@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StreamRent — Compra y venta de productos de streaming</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="dark">
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo-glow">SR</div>
+      <div class="brand-text">
+        <h1>StreamRent</h1>
+        <p class="tag">Compra • Vende • Conecta</p>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <a href="#inicio" class="active">Inicio</a>
+      <a href="#productos">Productos</a>
+      <a href="#contacto">Contacto</a>
+      <a href="#login" class="btn-outline">Ingresar</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="inicio" class="hero">
+      <img src="assets/banner_hero.png" alt="Banner hero" class="hero-banner" />
+      <div class="hero-content">
+        <h2>Tu mercado para todo lo relacionado con streaming</h2>
+        <p>Encuentra dispositivos, suscripciones y accesorios — todo en un mismo lugar.</p>
+        <div class="cta-row">
+          <a href="#productos" class="btn-primary">Ver Productos</a>
+          <a href="#contacto" class="btn-ghost">Contáctanos</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="productos" class="products">
+      <div class="section-header">
+        <h3>Productos destacados</h3>
+        <img src="assets/banner_products.png" alt="Productos" class="section-banner" />
+      </div>
+      <div class="product-grid" id="product-grid">
+        <!-- Cards will be dynamically injected to keep same backend endpoints intact -->
+      </div>
+    </section>
+
+    <section id="contacto" class="contact">
+      <div class="section-header">
+        <h3>Contacto</h3>
+        <p>¿Tienes dudas? Escríbenos.</p>
+      </div>
+      <form id="contact-form" class="contact-form" action="/contact" method="post">
+        <input name="name" placeholder="Nombre" required />
+        <input name="email" placeholder="Correo electrónico" required />
+        <textarea name="message" placeholder="Tu mensaje" rows="4" required></textarea>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Enviar</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="login" class="login">
+      <div class="login-card">
+        <h4>Ingresar</h4>
+        <form action="/login" method="post">
+          <input name="username" placeholder="Usuario" required />
+          <input name="password" type="password" placeholder="Contraseña" required />
+          <button type="submit" class="btn-primary">Entrar</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>© StreamRent — 2025</div>
+    <div class="social">Síguenos en redes</div>
+  </footer>
+
+  <script>
+    // Lightweight script to fetch products from backend endpoint if exists,
+    // otherwise show placeholders. We do not modify backend endpoints.
+    async function loadProducts(){
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = '';
+      try{
+        const res = await fetch('/api/products');
+        if(!res.ok) throw new Error('no backend');
+        const products = await res.json();
+        products.slice(0,8).forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <div class="thumb" style="background-image:url('${p.image || 'assets/banner_products.png'}')"></div>
+            <div class="info">
+              <h5>${p.name}</h5>
+              <p class="price">$${p.price || '---'}</p>
+              <a class="btn-outline small" href="/product/${p.id}">Ver</a>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }catch(e){
+        // placeholders
+        for(let i=0;i<8;i++){
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <div class="thumb" style="background-image:linear-gradient(135deg, rgba(0,0,0,0.2), rgba(255,255,255,0.02));"></div>
+            <div class="info">
+              <h5>Producto de ejemplo ${i+1}</h5>
+              <p class="price">$${(Math.random()*200+10).toFixed(2)}</p>
+              <a class="btn-outline small" href="#">Ver</a>
+            </div>
+          `;
+          grid.appendChild(card);
+        }
+      }
+    }
+    loadProducts();
+
+    // set footer year
+    document.querySelector('.site-footer').innerHTML = '© StreamRent — ' + new Date().getFullYear();
+  </script>
+</body>
+</html>
